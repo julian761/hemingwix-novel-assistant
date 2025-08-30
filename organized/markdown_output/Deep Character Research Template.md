@@ -1,0 +1,115 @@
+---
+title: "Deep Character Research Template"
+content_type: "character-development"
+created_date: "2025-08-30"
+source: "transcoded"
+status: "cleaned"
+---
+
+# **Deep Character Research Template for Reasoning Models**
+
+## **Template: Deep Character Research Prompt for Reasoning Models**
+
+**RESEARCH OBJECTIVE:** You are helping develop a complex \[CHARACTER ROLE: protagonist/antagonist/deuteragonist/supporting character\] for a literary novel about \[STORY THEME/GENRE\]. Generate detailed psychological, cultural, and behavioral research to create an authentic character profile.
+
+**CHARACTER CONTEXT:**
+
+* **Name:** \[CHARACTER NAME\]  
+* **Age:** \[AGE/BIRTH YEAR\]  
+* **Background:** \[CULTURAL/ETHNIC/NATIONAL BACKGROUND \+ KEY FAMILY HISTORY\]  
+* **Profession:** \[CURRENT JOB \+ CAREER TRAJECTORY\]  
+* **Personality:** \[3-4 KEY PERSONALITY TRAITS\]  
+* **Physical:** \[DISTINCTIVE PHYSICAL CHARACTERISTICS\]  
+* **Role in Story:** \[FUNCTION IN PLOT \+ RELATIONSHIP TO OTHER CHARACTERS\]  
+* **Character Arc:** \[HOW THEY CHANGE FROM BEGINNING TO END\]  
+* **Fatal Flaw/Core Wound:** \[PSYCHOLOGICAL WEAKNESS OR TRAUMA\]
+
+**RESEARCH AREAS:**
+
+**1\. PSYCHOLOGICAL FOUNDATION** Research the deep psychological patterns that drive this character:
+
+* \[SPECIFIC FORMATIVE EXPERIENCES: trauma, family dynamics, cultural displacement, etc.\]  
+* How \[BACKGROUND FACTORS\] typically shape personality development and worldview  
+* Internal thought patterns and rationalization mechanisms for \[CHARACTER'S MORAL CHOICES\]  
+* Psychological drivers behind \[KEY CHARACTER BEHAVIORS/DECISIONS\]  
+* How \[CORE WOUND/TRAUMA\] manifests in adult relationships and professional choices
+
+**2\. CULTURAL IDENTITY & BACKGROUND** Detail how \[CULTURAL/ETHNIC BACKGROUND\] manifests authentically in modern \[SETTING\]:
+
+* Daily habits, communication styles, and worldview markers that persist across generations  
+* How \[SPECIFIC CULTURAL GROUP\] navigates \[HOST COUNTRY\] professional/social environments  
+* Generational differences and conflicts within \[CULTURAL COMMUNITY\]  
+* Specific \[LOCATION\] community markers (neighborhoods, institutions, social patterns)  
+* How \[CULTURAL BACKGROUND\] influences approach to \[STORY THEMES: success, morality, relationships, etc.\]
+
+**3\. PROFESSIONAL IDENTITY & COMPETENCIES** Research how \[PROFESSION/INDUSTRY\] shapes personality and behavior:
+
+* \[PROFESSION\] culture, jargon, and professional identity markers  
+* How \[EDUCATIONAL BACKGROUND\] training influences approach to \[STORY CONFLICTS\]  
+* Career progression patterns and psychology for \[CHARACTER'S PROFESSIONAL TRAJECTORY\]  
+* Industry-specific ethical frameworks and how they're compromised/rationalized  
+* Power dynamics and relationship patterns common in \[PROFESSIONAL ENVIRONMENT\]
+
+**4\. SPEECH PATTERNS & COMMUNICATION STYLE** Identify authentic dialogue characteristics:
+
+* \[CULTURAL BACKGROUND\] linguistic markers in professional \[HOST COUNTRY\] contexts  
+* \[PROFESSION\] vocabulary mixed with \[CULTURAL/PERSONAL\] communication patterns  
+* How \[CHARACTER TRANSFORMATION\] changes speech patterns and social presence  
+* Specific humor style, verbal tics, and signature expressions  
+* Communication differences with various relationship types (authority figures, peers, subordinates)
+
+**5\. RELATIONSHIP DYNAMICS & SOCIAL PSYCHOLOGY** Research how this character type forms and maintains key relationships:
+
+* \[SPECIFIC RELATIONSHIP DYNAMIC: mentorship, friendship, rivalry, etc.\] patterns for someone with this background  
+* How \[CORE PSYCHOLOGICAL NEED\] drives relationship choices and loyalty patterns  
+* \[CHARACTER'S ROLE\] in group dynamics and social hierarchies  
+* How \[TRANSFORMATION ARC\] affects existing relationships and creates new conflicts  
+* Warning signs and breaking points in \[KEY RELATIONSHIP TYPE\] relationships
+
+**6\. PHYSICAL MANIFESTATION & BEHAVIORAL PATTERNS** Detail how this psychology expresses through physical presence and behavior:
+
+* Body language and physical habits during \[EMOTIONAL STATES: stress, confidence, deception, etc.\]  
+* How \[BACKGROUND FACTORS\] influence physical presentation and space navigation  
+* \[TRANSFORMATION ELEMENTS: physical changes, style evolution, etc.\] and their psychological significance  
+* Consumption patterns (food, drink, spending) that reveal character psychology  
+* Nervous habits, comfort behaviors, and stress responses
+
+**7\. \[STORY-SPECIFIC RESEARCH AREA\]** \[CUSTOMIZE BASED ON CHARACTER'S UNIQUE STORY FUNCTION \- examples:\]
+
+* **Corruption arc progression and rationalization patterns**  
+* **Mentor psychology and teaching/influence methods**  
+* **Leadership ambition and power-seeking behaviors**  
+* **Victim psychology and betrayal response patterns**  
+* **Romance/family dynamics and how they intersect with professional corruption**
+
+**OUTPUT FORMAT:** Organize findings under clear headers with specific examples, dialogue samples, and behavioral descriptions. Focus on details that would help a novelist write authentic scenes showing \[KEY CHARACTER MOMENTS/RELATIONSHIPS\]. Include cultural, professional, and psychological research sources where possible.
+
+**PRIORITY:** \[EMOTIONAL/PSYCHOLOGICAL AUTHENTICITY FOCUS \- customize based on character role\]. This character needs to feel like \[READER RELATIONSHIP GOAL: someone the reader likes/fears/understands/etc.\], making \[KEY STORY MOMENTS\] feel \[DESIRED EMOTIONAL IMPACT: tragic/terrifying/satisfying/etc.\] rather than just plot mechanics. The \[CULTURAL BACKGROUND\] should feel authentic and respectful while serving the story's themes about \[CENTRAL THEMES\].
+
+---
+
+## **USAGE INSTRUCTIONS:**
+
+1. Replace all \[BRACKETED PLACEHOLDERS\] with character-specific information  
+2. Customize Research Area \#7 based on the character's unique story function  
+3. Adjust the priority section to match the emotional role this character plays  
+4. Add any story-specific research areas that would be relevant to your particular narrative  
+5. Include specific cultural sensitivity notes if researching marginalized backgrounds
+
+## **ADDITIONAL RESEARCH AREAS TO CONSIDER ADDING:**
+
+* **Historical Context Research** (if character background involves specific historical events)  
+* **Industry/Professional Deep-Dive** (if character's work is central to the plot)  
+* **Regional/Geographic Specificity** (if setting details are crucial to authenticity)  
+* **Generational/Age Cohort Research** (if generational identity is important to character)  
+* **Socioeconomic Class Dynamics** (if class mobility/conflict drives character choices)
+
+## **QUALITY CONTROL CHECKLIST:**
+
+* \[ \] All bracketed placeholders replaced with specific information  
+* \[ \] Research areas align with character's story function  
+* \[ \] Cultural background research requests are respectful and specific  
+* \[ \] Professional/industry details match story's technical requirements  
+* \[ \] Psychological research connects to character's arc and relationships  
+* \[ \] Output format matches intended use (novel writing vs. screenplay vs. other)  
+* \[ \] Priority section clearly states emotional goals for reader relationship

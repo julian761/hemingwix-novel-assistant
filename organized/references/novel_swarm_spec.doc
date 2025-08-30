@@ -1,0 +1,100 @@
+{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Multi-Agent Swarm Specification for a Novel-Writing Super-Agent\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Overview\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This document defines a working specification for a multi-agent \u8220"swarm\u8221" system designed to support long-form novel writing. The system is {\b platform-agnostic}, modular, and structured around one {\b Orchestrator Agent} and four {\b Focused AI Assistants}. Together they maintain coherence, consistency, and quality across the drafting process.\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 The Five Agents\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 1. Orchestrator (Super-Agent)\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Role:} Supervises, plans, delegates, and synthesizes outputs.\line {\b Inputs:} User goals, style guides, canon (memory).\line {\b Outputs:} Task plans, merged drafts, revision briefs, canonical updates.\line {\b Responsibilities:} - Plan & decompose user requests. - Route tasks to specialists. - Enforce constraints (POV, tense, genre, length). - Merge and QA outputs. - Govern shared memory and change logs.\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 2. Story Architect\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Role:} Designs macro-structure (acts, sequences, beats).\line {\b Inputs:} Genre brief, comps, outline.\line {\b Outputs:} Updated outline, beats, pacing notes.\line {\b Responsibilities:} - Maintain beat sheets (3-act, 7-point, or custom).\line - Track pacing and thematic arcs.\line - Provide change rationales when adjusting story flow.\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 3. Character & Continuity Agent\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Role:} Ensures consistency of character arcs, voices, and timelines.\line {\b Inputs:} Character sheets, prior chapters, outline.\line {\b Outputs:} Updated character dossiers, continuity approvals/flags.\line {\b Responsibilities:} - Maintain character bible and dialogue consistency.\line - Detect contradictions, anachronisms, or POV drift.\line - Approve/reject changes before canon update.\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 4. Research & World Modeler\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Role:} Provides grounding facts, citations, and manages world-building.\line {\b Inputs:} Research queries, world assumptions, user notes.\line {\b Outputs:} Grounding packets, citations, world-bible updates.\line {\b Responsibilities:} - Verify facts and plausibility.\line - Update world bible with new rules, lore, or factual data.\line - Flag cultural, ethical, or legal risks.\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 5. Prose Stylist & Line Editor\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Role:} Drafts and polishes prose consistent with style guide.\line {\b Inputs:} Scene briefs, constraints, beats, citations.\line {\b Outputs:} Draft scenes, polished passages, alternative takes.\line {\b Responsibilities:} - Translate beats into compelling text.\line - Enforce narrative voice and cadence.\line - Offer stylistic alternatives (A/B drafts).\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Shared Memory\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The agents use a {\b central memory layer} accessible via read/write APIs.\line Components include: - {\b World Bible} (entities, rules, locations).\line - {\b Outline & Beat Ledger} (hierarchical structure with statuses).\line - {\b Character Dossiers} (bios, arcs, voices).\line - {\b Timeline Graph} (events and dependencies).\line - {\b Sources Index} (citations, sensitivity notes).\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Only the Orchestrator commits final canonical updates.\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Message Schema\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 Task Schema\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 \{\line
+  "goal": "Draft Scene",\line
+  "constraints": \{\line
+    "word_count": "1400-1600",\line
+    "tense": "present",\line
+    "POV": "first-person",\line
+    "style": "noir"\line
+  \},\line
+  "inputs": ["Ch.7, Scene 2 beats", "Character arcs", "World bible refs"],\line
+  "acceptance_tests": ["POV=first-person", "word_count <=1600", "continuity=pass"],\line
+  "return_schema": "scene_draft"\line
+\}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 Result Schema\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 \{\line
+  "status": "success",\line
+  "artifact_uri": "memory://scenes/ch7_s2_v2",\line
+  "citations": ["src:research/finance-fraud-note1"],\line
+  "rationales": ["Continuity preserved, Caleb arc updated"],\line
+  "version": "2.1"\line
+\}\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Orchestration Workflow (Example: Draft Chapter 7, Scene 2)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab User request \u8594? Orchestrator parses intent.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Orchestrator retrieves canon from memory.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Story Architect confirms beats and pacing.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab Character & Continuity validates arcs/voices.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab Research provides grounding packet + citations.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 6.\tx360\tab Prose Stylist drafts scene.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 7.\tx360\tab Orchestrator merges, QA-checks, and requests revisions if needed.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 8.\tx360\tab Orchestrator updates memory and delivers draft with change log.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Sequence Diagram\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 sequenceDiagram\line
+    participant U as Author\line
+    participant O as Orchestrator\line
+    participant A as Story Architect\line
+    participant C as Character & Continuity\line
+    participant R as Research & World Modeler\line
+    participant P as Prose Stylist\line
+    participant M as Shared Memory\line
+\line
+    U->>O: "Draft Ch.7 Sc.2 \u8212- noir, 1400-1600 words"\line
+    O->>M: Retrieve outline, beats, character sheets\line
+    O->>A: Confirm beats + pacing\line
+    A->>M: Update beats\line
+    A-->>O: Outline approved\line
+    O->>C: Validate character arcs + timeline\line
+    C-->>O: Continuity check OK\line
+    O->>R: Provide factual grounding + world notes\line
+    R-->>O: Grounding packet with citations\line
+    O->>P: Draft scene (constraints enforced)\line
+    P-->>O: Draft v1\line
+    O->>O: QA & revision loop\line
+    O->>M: Commit final draft + version log\line
+    O-->>U: Deliver scene + change log\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Quality & Safety Controls\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Continuity tests:} POV/tense, timeline, contradictions.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Legal/ethics:} Flag defamation/privacy risks.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Style checks:} Regex + embeddings for banned/required stylistic rules.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Plagiarism scan:} Compare against prior memory & external corpora.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Cultural review:} Optional sensitivity checks.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Recommendations\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Begin with a {\b three-agent minimum} (Orchestrator, Architect, Stylist).\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Add Character & Research agents for canonical drafts.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Use caching to reduce cost.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Implement human-in-the-loop approvals for major canon updates.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+}
