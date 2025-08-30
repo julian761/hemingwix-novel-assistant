@@ -1,0 +1,20 @@
+# GitHub Repository Setup Commands
+# Run these commands after creating your repository on GitHub
+
+# Add the remote repository (replace YOUR_USERNAME with your GitHub username)
+git remote add origin https://github.com/YOUR_USERNAME/hemingwix-novel-assistant.git
+
+# Push to GitHub
+git branch -M main
+git push -u origin main
+
+# Alternative SSH method (if you have SSH keys set up)
+# git remote add origin git@github.com:YOUR_USERNAME/hemingwix-novel-assistant.git
+# git branch -M main  
+# git push -u origin main
+
+# Verify the remote was added correctly
+git remote -v
+
+# Check status after push
+git status
