@@ -1,0 +1,85 @@
+{
+  "mcpServers": {
+    "hemingwix-notion": {
+      "command": "python",
+      "args": ["server.py"],
+      "cwd": "./mcp_server",
+      "env": {
+        "NOTION_TOKEN": "${NOTION_TOKEN}",
+        "NOTION_CHARACTERS_DB_ID": "${NOTION_CHARACTERS_DB_ID}",
+        "NOTION_CHAPTERS_DB_ID": "${NOTION_CHAPTERS_DB_ID}",
+        "NOTION_PLOT_DB_ID": "${NOTION_PLOT_DB_ID}",
+        "NOTION_RESEARCH_DB_ID": "${NOTION_RESEARCH_DB_ID}"
+      }
+    }
+  },
+  "metadata": {
+    "name": "Hemingwix Notion MCP Server",
+    "description": "Model Context Protocol server for Notion database integration in novel writing",
+    "version": "1.0.0",
+    "author": "Hemingwix Project",
+    "capabilities": [
+      "Database querying",
+      "Content creation", 
+      "Full-text search",
+      "Character management",
+      "Plot structure tracking",
+      "Research organization"
+    ],
+    "databases": {
+      "characters": {
+        "name": "Characters",
+        "description": "Character profiles, backstories, and development tracking",
+        "properties": {
+          "name": "Character name",
+          "description": "Character description and traits",
+          "archetype": "Character archetype/role",
+          "motivation": "Character motivation and goals",
+          "backstory": "Character background and history",
+          "voice_notes": "Notes about character voice and dialogue",
+          "status": "Character development status"
+        }
+      },
+      "chapters": {
+        "name": "Chapters", 
+        "description": "Chapter content, outlines, and progress tracking",
+        "properties": {
+          "title": "Chapter title",
+          "chapter_number": "Chapter sequence number",
+          "word_count": "Word count for the chapter",
+          "status": "Writing progress status",
+          "pov_character": "Point of view character",
+          "content": "Chapter content",
+          "outline": "Chapter outline and structure",
+          "notes": "Writing notes and ideas"
+        }
+      },
+      "plot_points": {
+        "name": "Plot Points",
+        "description": "Story structure, scenes, and narrative beats",
+        "properties": {
+          "title": "Plot point title",
+          "description": "Detailed description of the plot point",
+          "act": "Story act (I, II, III)",
+          "chapter": "Related chapter",
+          "characters_involved": "Characters present in this plot point",
+          "plot_type": "Type of plot point (setup, conflict, climax, etc.)",
+          "status": "Development status"
+        }
+      },
+      "research": {
+        "name": "Research",
+        "description": "Research notes, sources, and reference material",
+        "properties": {
+          "title": "Research topic title",
+          "topic": "Research category",
+          "summary": "Research summary and key points",
+          "sources": "Source citations and references",
+          "reliability": "Source reliability assessment",
+          "related_chapters": "Chapters that use this research",
+          "tags": "Research tags for organization"
+        }
+      }
+    }
+  }
+}

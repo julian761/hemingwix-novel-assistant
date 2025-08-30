@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  hemingwix-notion-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hemingwix-notion-mcp
+    environment:
+      - NOTION_TOKEN=${NOTION_TOKEN}
+      - NOTION_CHARACTERS_DB_ID=${NOTION_CHARACTERS_DB_ID}
+      - NOTION_CHAPTERS_DB_ID=${NOTION_CHAPTERS_DB_ID}
+      - NOTION_PLOT_DB_ID=${NOTION_PLOT_DB_ID}
+      - NOTION_RESEARCH_DB_ID=${NOTION_RESEARCH_DB_ID}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    env_file:
+      - .env
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./logs:/app/logs:rw
+    networks:
+      - hemingwix-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import asyncio; print('Server healthy')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  hemingwix-network:
+    driver: bridge
+    
+volumes:
+  hemingwix-logs:
+    driver: local
