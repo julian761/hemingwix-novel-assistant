@@ -13,6 +13,12 @@ from datetime import datetime
 from pathlib import Path
 import uuid
 from werkzeug.utils import secure_filename
+from anthropic import Anthropic
+from typing import List, Dict, Any
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -20,6 +26,11 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 
 # Ensure upload directory exists
 os.makedirs('uploads', exist_ok=True)
+
+# Initialize Anthropic client
+anthropic_client = Anthropic(
+    api_key=os.getenv('ANTHROPIC_API_KEY')
+)
 
 def init_database():
     """Initialize SQLite database for conversation storage"""
@@ -217,8 +228,11 @@ def orchestrator_chat_api():
     # Save user message
     save_message(conversation_id, 'user', message)
     
-    # Orchestrator processes the request and delegates to agents
-    orchestrator_response = orchestrator_process_request(message, conversation_id)
+    # Get conversation history for context
+    messages = get_conversation_messages(conversation_id)
+    
+    # Orchestrator processes the request using Anthropic API
+    orchestrator_response = orchestrator_process_request_ai(message, messages, conversation_id)
     
     # Save orchestrator response
     message_id = save_message(conversation_id, 'orchestrator', orchestrator_response['response'], 'orchestrator')
@@ -250,8 +264,11 @@ def agent_chat_api():
     # Save user message
     save_message(conversation_id, 'user', message)
     
-    # Direct agent response
-    response = generate_specialist_response(agent, message, conversation_id)
+    # Get conversation history for context
+    messages = get_conversation_messages(conversation_id)
+    
+    # Direct agent response using AI
+    response = generate_specialist_response_ai(agent, message, messages, conversation_id)
     
     # Save agent response
     save_message(conversation_id, 'agent', response, agent)
@@ -305,6 +322,97 @@ def upload_file():
             'category': category,
             'message': f'File "{filename}" uploaded successfully to {category}!'
         })
+
+def orchestrator_process_request_ai(user_message: str, conversation_history: List, conversation_id: str) -> Dict[str, Any]:
+    """Use Anthropic API to process user request as an AI orchestrator"""
+    
+    # Build conversation context
+    context_messages = []
+    for msg in conversation_history[-10:]:  # Last 10 messages for context
+        role = "user" if msg[0] == "user" else "assistant"
+        context_messages.append(f"{role}: {msg[1]}")
+    
+    system_prompt = """You are an AI Writing Orchestrator for the novel "Broken Drill". You coordinate multiple specialist agents to provide comprehensive novel writing assistance.
+
+Your specialist agents include:
+- Character Development Specialist: Deep character psychology, backstories, motivations, and character arcs
+- Plot Structure Specialist: Story architecture, pacing, narrative beats, three-act structure
+- Dialogue Specialist: Character voice, subtext, conversation flow, authentic dialogue
+- Research Assistant: Fact-checking, world-building details, source verification
+
+When responding:
+1. Analyze the user's request to determine which aspects need attention
+2. Provide a comprehensive response that addresses multiple angles when relevant
+3. Structure your response clearly with sections for different aspects
+4. Be specific and actionable in your guidance
+5. Reference the "Broken Drill" novel context when applicable
+
+Format your response with clear sections using markdown formatting."""
+
+    try:
+        # Create the message for Anthropic API
+        response = anthropic_client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=2000,
+            temperature=0.7,
+            system=system_prompt,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Previous conversation:\n{chr(10).join(context_messages[-5:]) if context_messages else 'No previous context'}\n\nCurrent request: {user_message}"
+                }
+            ]
+        )
+        
+        # Extract the response text
+        response_text = response.content[0].text
+        
+        print("CLAUDE RESPONSE: ", response_text)
+
+        # Simulate agent interactions for UI consistency
+        agent_interactions = []
+        
+        # Determine which "agents" were involved based on content
+        if any(word in user_message.lower() for word in ['character', 'protagonist', 'personality']):
+            agent_interactions.append({
+                'agent': 'character',
+                'task': 'Character analysis',
+                'response': 'Provided character development insights'
+            })
+        
+        if any(word in user_message.lower() for word in ['plot', 'story', 'structure', 'chapter']):
+            agent_interactions.append({
+                'agent': 'plot',
+                'task': 'Plot structure analysis',
+                'response': 'Provided plot structure guidance'
+            })
+        
+        if any(word in user_message.lower() for word in ['dialogue', 'conversation', 'says', 'voice']):
+            agent_interactions.append({
+                'agent': 'dialogue',
+                'task': 'Dialogue crafting',
+                'response': 'Provided dialogue expertise'
+            })
+        
+        if any(word in user_message.lower() for word in ['research', 'facts', 'realistic', 'accurate']):
+            agent_interactions.append({
+                'agent': 'research',
+                'task': 'Research and verification',
+                'response': 'Provided research assistance'
+            })
+        
+        return {
+            'response': response_text,
+            'agent_interactions': agent_interactions
+        }
+        
+    except Exception as e:
+        print(f"Error calling Anthropic API: {e}")
+        # Fallback response
+        return {
+            'response': f"I apologize, but I encountered an error while processing your request. Please ensure your ANTHROPIC_API_KEY environment variable is set correctly. Error: {str(e)}",
+            'agent_interactions': []
+        }
 
 def orchestrator_process_request(user_message, conversation_id):
     """Orchestrator analyzes request and coordinates specialist agents"""
@@ -419,6 +527,83 @@ def synthesize_agent_responses(user_message, agent_interactions, analysis):
         )
     
     return "\n".join(response_parts)
+
+def generate_specialist_response_ai(agent_name: str, message: str, conversation_history: List, conversation_id: str) -> str:
+    """Generate response from specialist agent using Anthropic API"""
+    
+    # Build conversation context
+    context_messages = []
+    for msg in conversation_history[-10:]:  # Last 10 messages for context
+        role = "user" if msg[0] == "user" else "assistant"
+        context_messages.append(f"{role}: {msg[1]}")
+    
+    # Agent-specific system prompts
+    agent_prompts = {
+        'character': """You are a Character Development Specialist for the novel "Broken Drill". You provide deep expertise in:
+- Character psychology and internal motivations
+- Backstory development and character history
+- Character arcs and transformational journeys
+- Personality traits and behavioral patterns
+- Internal conflicts and contradictions
+- Relationship dynamics between characters
+
+Focus on psychological depth, authentic motivations, and how characters drive the narrative through their choices and growth.""",
+        
+        'plot': """You are a Plot Structure Specialist for the novel "Broken Drill". You provide expertise in:
+- Three-act structure and story architecture
+- Narrative pacing and tension building
+- Plot points, beats, and turning points
+- Conflict escalation and resolution
+- Subplot integration and parallel narratives
+- Cause-and-effect story logic
+- Climax construction and payoffs
+
+Focus on structural integrity, narrative momentum, and how plot serves both entertainment and thematic purposes.""",
+        
+        'dialogue': """You are a Dialogue Specialist for the novel "Broken Drill". You provide expertise in:
+- Unique character voices and speech patterns
+- Subtext and what characters don't say
+- Dialogue that reveals character and advances plot
+- Natural conversation flow and interruptions
+- Regional dialects and professional jargon
+- Emotional undertones in conversation
+- Power dynamics through dialogue
+
+Focus on authentic voices, meaningful subtext, and dialogue that serves multiple narrative purposes simultaneously.""",
+        
+        'research': """You are a Research Assistant for the novel "Broken Drill". You provide expertise in:
+- Fact-checking and verification strategies
+- Historical and cultural accuracy
+- Technical and professional details
+- World-building consistency
+- Source credibility assessment
+- Research methodologies for fiction
+- Balancing accuracy with dramatic needs
+
+Focus on enhancing authenticity, finding credible sources, and knowing when accuracy serves the story versus when dramatic license is appropriate."""
+    }
+    
+    system_prompt = agent_prompts.get(agent_name, f"You are a {agent_name.replace('_', ' ').title()} Specialist for the novel 'Broken Drill'. Provide focused expertise in your area of specialization.")
+    
+    try:
+        response = anthropic_client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1500,
+            temperature=0.7,
+            system=system_prompt,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Previous conversation:\n{chr(10).join(context_messages[-3:]) if context_messages else 'No previous context'}\n\nCurrent request: {message}"
+                }
+            ]
+        )
+        
+        return response.content[0].text
+        
+    except Exception as e:
+        print(f"Error calling Anthropic API for {agent_name}: {e}")
+        return f"I apologize, but I encountered an error while processing your request. Please ensure your ANTHROPIC_API_KEY environment variable is set correctly."
 
 def generate_specialist_response(agent_name, message, conversation_id):
     """Generate response from individual specialist agent"""
