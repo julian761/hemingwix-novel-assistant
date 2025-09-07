@@ -16,6 +16,8 @@ from werkzeug.utils import secure_filename
 from anthropic import Anthropic
 from typing import List, Dict, Any
 from dotenv import load_dotenv
+import markdown
+from notion_client import Client
 
 # Load environment variables from .env file
 load_dotenv()
@@ -31,6 +33,20 @@ os.makedirs('uploads', exist_ok=True)
 anthropic_client = Anthropic(
     api_key=os.getenv('ANTHROPIC_API_KEY')
 )
+
+# Initialize Notion client
+notion_client = None
+notion_api_key = os.getenv('NOTION_API_KEY')
+print(f"Notion API key found: {'Yes' if notion_api_key else 'No'}")
+
+try:
+    if notion_api_key:
+        notion_client = Client(auth=notion_api_key)
+        print("Notion client initialized successfully")
+    else:
+        print("No Notion API key found in environment")
+except Exception as e:
+    print(f"Notion client initialization failed: {e}")
 
 def init_database():
     """Initialize SQLite database for conversation storage"""
@@ -205,6 +221,529 @@ def specialist_chat(agent_name):
                                 agent_name=agent_name, 
                                 conversation_id=conversation_id,
                                 messages=messages)
+
+# Serve chapter files
+@app.route('/chapter/<chapter_name>')
+def serve_chapter(chapter_name):
+    """Serve chapter files for viewing"""
+    import os
+    from flask import Response
+    
+    # Define chapter file paths - updated to use markdown files
+    chapter_files = {
+        'prologue': 'organized/markdown_output/Prologue.md',
+        'chapter-1': 'organized/markdown_output/Chapter 1.md',
+        'chapter-2': 'organized/markdown_output/Chapter 2.md', 
+        'chapter-3': 'organized/markdown_output/Chapter 3.md',
+        'chapter-4': 'organized/markdown_output/Chapter 4.md',
+        'chapter-5': 'organized/markdown_output/Chapter 5 .md'
+    }
+    
+    if chapter_name not in chapter_files:
+        return "Chapter not found", 404
+    
+    file_path = chapter_files[chapter_name]
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            markdown_content = f.read()
+        
+        # Convert markdown to HTML
+        html_content = markdown.markdown(markdown_content, extensions=['extra'])
+        
+        # Create a simple HTML page to display the chapter
+        html_template = f'''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>{chapter_name.replace('-', ' ').title()} - Broken Drill</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {{
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 40px 20px;
+                    line-height: 1.6;
+                    background: #f8f9fa;
+                }}
+                .header {{
+                    text-align: center;
+                    margin-bottom: 40px;
+                    padding-bottom: 20px;
+                    border-bottom: 2px solid #667eea;
+                }}
+                .header h1 {{
+                    color: #333;
+                    margin-bottom: 10px;
+                }}
+                .header p {{
+                    color: #666;
+                }}
+                .content {{
+                    background: white;
+                    padding: 40px;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    white-space: pre-wrap;
+                    line-height: 1.8;
+                    font-size: 16px;
+                }}
+                .content h1, .content h2, .content h3 {{
+                    color: #333;
+                    margin-top: 30px;
+                    margin-bottom: 15px;
+                }}
+                .content h1 {{ font-size: 24px; }}
+                .content h2 {{ font-size: 22px; }}
+                .content h3 {{ font-size: 20px; }}
+                .content p {{
+                    margin-bottom: 15px;
+                }}
+                .content strong {{
+                    font-weight: bold;
+                    color: #222;
+                }}
+                .content em {{
+                    font-style: italic;
+                }}
+                .content hr {{
+                    border: none;
+                    border-top: 2px solid #ddd;
+                    margin: 30px 0;
+                }}
+                .back-btn {{
+                    display: inline-block;
+                    margin-bottom: 20px;
+                    padding: 10px 20px;
+                    background: linear-gradient(45deg, #667eea, #764ba2);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 8px;
+                }}
+                .back-btn:hover {{
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                }}
+            </style>
+        </head>
+        <body>
+            <a href="/" class="back-btn">← Back to Dashboard</a>
+            <div class="header">
+                <h1>{chapter_name.replace('-', ' ').title()}</h1>
+                <p>Broken Drill Novel</p>
+            </div>
+            <div class="content">{html_content}</div>
+        </body>
+        </html>
+        '''
+        
+        return html_template
+        
+    except FileNotFoundError:
+        return f"Chapter file not found: {file_path}", 404
+    except Exception as e:
+        return f"Error reading chapter: {str(e)}", 500
+
+# Serve story outline
+@app.route('/outline')
+def serve_outline():
+    """Serve the story outline for viewing"""
+    import os
+    from flask import Response
+    
+    file_path = 'organized/markdown_output/Broken Drill - Outline - v2.md'
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            markdown_content = f.read()
+        
+        # Convert markdown to HTML
+        html_content = markdown.markdown(markdown_content, extensions=['extra'])
+        
+        # Create a simple HTML page to display the outline
+        html_template = f'''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Story Outline - Broken Drill</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {{
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 40px 20px;
+                    line-height: 1.6;
+                    background: #f8f9fa;
+                }}
+                .header {{
+                    text-align: center;
+                    margin-bottom: 40px;
+                    padding-bottom: 20px;
+                    border-bottom: 2px solid #667eea;
+                }}
+                .header h1 {{
+                    color: #333;
+                    margin-bottom: 10px;
+                }}
+                .header p {{
+                    color: #666;
+                }}
+                .content {{
+                    background: white;
+                    padding: 40px;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    white-space: pre-wrap;
+                    line-height: 1.8;
+                    font-size: 16px;
+                }}
+                .content h1, .content h2, .content h3 {{
+                    color: #333;
+                    margin-top: 30px;
+                    margin-bottom: 15px;
+                }}
+                .content h1 {{ font-size: 24px; }}
+                .content h2 {{ font-size: 22px; }}
+                .content h3 {{ font-size: 20px; }}
+                .content p {{
+                    margin-bottom: 15px;
+                }}
+                .content strong {{
+                    font-weight: bold;
+                    color: #222;
+                }}
+                .content em {{
+                    font-style: italic;
+                }}
+                .content hr {{
+                    border: none;
+                    border-top: 2px solid #ddd;
+                    margin: 30px 0;
+                }}
+                .content ul, .content ol {{
+                    margin-left: 20px;
+                    margin-bottom: 15px;
+                }}
+                .content li {{
+                    margin-bottom: 8px;
+                }}
+                .back-btn {{
+                    display: inline-block;
+                    margin-bottom: 20px;
+                    padding: 10px 20px;
+                    background: linear-gradient(45deg, #667eea, #764ba2);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 8px;
+                }}
+                .back-btn:hover {{
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                }}
+            </style>
+        </head>
+        <body>
+            <a href="/" class="back-btn">← Back to Dashboard</a>
+            <div class="header">
+                <h1>Story Outline v2</h1>
+                <p>Broken Drill Novel</p>
+            </div>
+            <div class="content">{html_content}</div>
+        </body>
+        </html>
+        '''
+        
+        return html_template
+        
+    except FileNotFoundError:
+        return f"Outline file not found: {file_path}", 404
+    except Exception as e:
+        return f"Error reading outline: {str(e)}", 500
+
+def get_notion_characters():
+    """Fetch character data from Notion database"""
+    print(f"get_notion_characters called, notion_client exists: {notion_client is not None}")
+    if not notion_client:
+        print("No notion client available")
+        return None
+    
+    try:
+        # Get database ID from environment variable
+        database_id = os.getenv('NOTION_CHARACTER_DATABASE_ID')
+        if not database_id:
+            print("No database ID found")
+            return None
+        
+        print(f"Querying database: {database_id}")
+        
+        # First get database info to see available properties
+        database_info = notion_client.databases.retrieve(database_id=database_id)
+        properties = database_info.get('properties', {})
+        print(f"Available properties: {list(properties.keys())}")
+        
+        # Find the title property (usually the first column)
+        title_property = None
+        for prop_name, prop_data in properties.items():
+            if prop_data.get('type') == 'title':
+                title_property = prop_name
+                break
+        
+        print(f"Title property found: {title_property}")
+        
+        # Query the database (without sorting if we can't find a good property)
+        if title_property:
+            response = notion_client.databases.query(
+                database_id=database_id,
+                sorts=[
+                    {
+                        "property": title_property,
+                        "direction": "ascending"
+                    }
+                ]
+            )
+        else:
+            response = notion_client.databases.query(database_id=database_id)
+        
+        characters = []
+        for page in response['results']:
+            character = {}
+            page_properties = page['properties']
+            
+            # Extract all properties dynamically
+            for prop_name, prop_data in page_properties.items():
+                if prop_data['type'] == 'title' and prop_data['title']:
+                    character['name'] = prop_data['title'][0]['plain_text']
+                elif prop_data['type'] == 'rich_text' and prop_data['rich_text']:
+                    character[prop_name.lower().replace(' ', '_')] = prop_data['rich_text'][0]['plain_text']
+                elif prop_data['type'] == 'select' and prop_data['select']:
+                    character[prop_name.lower().replace(' ', '_')] = prop_data['select']['name']
+                elif prop_data['type'] == 'multi_select' and prop_data['multi_select']:
+                    character[prop_name.lower().replace(' ', '_')] = [item['name'] for item in prop_data['multi_select']]
+                elif prop_data['type'] == 'number' and prop_data['number'] is not None:
+                    character[prop_name.lower().replace(' ', '_')] = str(prop_data['number'])
+                elif prop_data['type'] == 'checkbox':
+                    character[prop_name.lower().replace(' ', '_')] = 'Yes' if prop_data['checkbox'] else 'No'
+            
+            # Ensure character has a name
+            if 'name' not in character:
+                character['name'] = 'Unnamed Character'
+            
+            characters.append(character)
+        
+        print(f"Found {len(characters)} characters")
+        
+        return characters
+        
+    except Exception as e:
+        print(f"Error fetching Notion characters: {e}")
+        return None
+
+# Serve character profiles
+@app.route('/characters')
+def serve_characters():
+    """Serve character profiles from Notion database"""
+    
+    # Try to get characters from Notion
+    characters = get_notion_characters()
+    
+    if characters is None:
+        # Fallback content if Notion isn't configured
+        fallback_content = """
+        <div style="text-align: center; padding: 40px;">
+            <h2>Character Profiles</h2>
+            <p>To display character profiles from Notion, please configure:</p>
+            <ul style="text-align: left; max-width: 400px; margin: 20px auto;">
+                <li>NOTION_API_KEY in your .env file</li>
+                <li>NOTION_CHARACTER_DATABASE_ID in your .env file</li>
+            </ul>
+            <p><a href="https://developers.notion.com/docs/create-a-notion-integration" target="_blank">Learn how to set up Notion API</a></p>
+        </div>
+        """
+        characters_html = fallback_content
+    else:
+        # Generate HTML for characters with compact list + expandable details
+        characters_html = '<div id="character-list">'
+        for i, char in enumerate(characters):
+            # Get character name
+            char_name = char.get('name', 'Unnamed Character')
+            
+            # Try to find a description field (common names)
+            description = (
+                char.get('description') or 
+                char.get('summary') or 
+                char.get('bio') or 
+                char.get('overview') or 
+                char.get('role') or 
+                "No description available"
+            )
+            
+            # Create the character list item with dropdown and drag functionality
+            char_item = f"""
+            <div class="character-item" draggable="true" data-character-id="{i}" style="border-bottom: 1px solid #e9ecef; padding: 15px 0; transition: all 0.3s ease;">
+                <div class="character-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="drag-handle" style="cursor: grab; color: #ccc; margin-right: 10px; font-size: 16px; user-select: none;" title="Drag to reorder">⋮⋮</div>
+                    <div onclick="toggleCharacterDetails('{i}')" style="cursor: pointer; flex: 1; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="color: #667eea; margin: 0 0 5px 0; font-size: 18px;">{char_name}</h3>
+                            <p style="color: #666; margin: 0; font-style: italic;">{description}</p>
+                        </div>
+                        <span class="dropdown-arrow" id="arrow-{i}" style="color: #667eea; font-size: 18px;">▼</span>
+                    </div>
+                </div>
+                
+                <div class="character-details" id="details-{i}" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0;">
+            """
+            
+            # Add all other character properties to the dropdown
+            detail_count = 0
+            for key, value in char.items():
+                if key not in ['name', 'description', 'summary', 'bio', 'overview', 'role'] and value:
+                    formatted_key = key.replace('_', ' ').title()
+                    if isinstance(value, list):
+                        value = ', '.join(value)
+                    char_item += f"""
+                    <div style="margin-bottom: 8px;">
+                        <strong style="color: #333;">{formatted_key}:</strong> 
+                        <span style="color: #666;">{value}</span>
+                    </div>
+                    """
+                    detail_count += 1
+            
+            if detail_count == 0:
+                char_item += "<p style='color: #999; font-style: italic;'>No additional details available</p>"
+            
+            char_item += """
+                </div>
+            </div>
+            """
+            
+            characters_html += char_item
+        
+        characters_html += '</div>'  # Close character-list div
+        
+        if len(characters) == 0:
+            characters_html = "<p>No characters found in the Notion database.</p>"
+    
+    # Create HTML template
+    html_template = f'''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Character Profiles - Broken Drill</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {{
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 40px 20px;
+                line-height: 1.6;
+                background: #f8f9fa;
+            }}
+            .header {{
+                text-align: center;
+                margin-bottom: 40px;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #667eea;
+            }}
+            .header h1 {{
+                color: #333;
+                margin-bottom: 10px;
+            }}
+            .header p {{
+                color: #666;
+            }}
+            .content {{
+                background: white;
+                padding: 40px;
+                border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                line-height: 1.8;
+                font-size: 16px;
+            }}
+            .back-btn {{
+                display: inline-block;
+                margin-bottom: 20px;
+                padding: 10px 20px;
+                background: linear-gradient(45deg, #667eea, #764ba2);
+                color: white;
+                text-decoration: none;
+                border-radius: 8px;
+            }}
+            .back-btn:hover {{
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            }}
+            ul {{
+                text-align: left;
+            }}
+            .character-item:hover {{
+                background-color: #f8f9fa;
+            }}
+            .character-header:hover {{
+                background-color: rgba(102, 126, 234, 0.05);
+                border-radius: 8px;
+                padding: 10px;
+                margin: -10px;
+            }}
+            .character-item:last-child {{
+                border-bottom: none;
+            }}
+            .dropdown-arrow {{
+                transition: transform 0.3s ease;
+            }}
+            .dropdown-arrow.rotated {{
+                transform: rotate(180deg);
+            }}
+        </style>
+    </head>
+    <body>
+        <a href="/" class="back-btn">← Back to Dashboard</a>
+        <div class="header">
+            <h1>Character Profiles</h1>
+            <p>Broken Drill Novel Characters</p>
+        </div>
+        <div class="content">
+            {characters_html}
+        </div>
+        
+        <script>
+        function toggleCharacterDetails(characterId) {{
+            const details = document.getElementById('details-' + characterId);
+            const arrow = document.getElementById('arrow-' + characterId);
+            
+            if (details.style.display === 'none' || details.style.display === '') {{
+                details.style.display = 'block';
+                arrow.classList.add('rotated');
+                arrow.innerHTML = '▲';
+            }} else {{
+                details.style.display = 'none';
+                arrow.classList.remove('rotated');
+                arrow.innerHTML = '▼';
+            }}
+        }}
+        
+        // Close all dropdowns when clicking outside
+        document.addEventListener('click', function(event) {{
+            if (!event.target.closest('.character-item')) {{
+                const allDetails = document.querySelectorAll('.character-details');
+                const allArrows = document.querySelectorAll('.dropdown-arrow');
+                
+                allDetails.forEach(detail => detail.style.display = 'none');
+                allArrows.forEach(arrow => {{
+                    arrow.classList.remove('rotated');
+                    arrow.innerHTML = '▼';
+                }});
+            }}
+        }});
+        </script>
+    </body>
+    </html>
+    '''
+    
+    return html_template
 
 # API: Start new orchestrator conversation
 @app.route('/api/orchestrator/new', methods=['POST'])
@@ -755,6 +1294,20 @@ ORCHESTRATOR_DASHBOARD = '''
             gap: 15px;
         }
         
+        .book-stack-silhouette {
+            position: relative;
+            margin-right: 5px;
+        }
+        
+        .book-stack-silhouette svg {
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            transition: transform 0.3s ease;
+        }
+        
+        .book-stack-silhouette:hover svg {
+            transform: scale(1.1) rotate(2deg);
+        }
+        
         .logo-text {
             font-size: 2em;
             font-weight: bold;
@@ -991,6 +1544,60 @@ ORCHESTRATOR_DASHBOARD = '''
             background: #e9ecef;
         }
         
+        .dropdown-container {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: #333;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-toggle::after {
+            content: '▼';
+            font-size: 0.8em;
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .dropdown-toggle.active::after {
+            transform: rotate(180deg);
+        }
+        
         @media (max-width: 1024px) {
             .main-layout {
                 grid-template-columns: 1fr;
@@ -1007,8 +1614,39 @@ ORCHESTRATOR_DASHBOARD = '''
     <div class="header">
         <div class="header-content">
             <div class="logo">
+                <div class="book-stack-silhouette">
+                    <svg width="40" height="32" viewBox="0 0 40 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="20" width="16" height="10" rx="1" fill="url(#gradient1)" opacity="0.9"/>
+                        <rect x="6" y="16" width="18" height="8" rx="1" fill="url(#gradient2)" opacity="0.8"/>
+                        <rect x="10" y="12" width="20" height="8" rx="1" fill="url(#gradient3)" opacity="0.7"/>
+                        <rect x="14" y="8" width="22" height="8" rx="1" fill="url(#gradient4)" opacity="0.6"/>
+                        <rect x="18" y="4" width="20" height="8" rx="1" fill="url(#gradient5)" opacity="0.5"/>
+                        <defs>
+                            <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea"/>
+                                <stop offset="100%" style="stop-color:#764ba2"/>
+                            </linearGradient>
+                            <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#764ba2"/>
+                                <stop offset="100%" style="stop-color:#667eea"/>
+                            </linearGradient>
+                            <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea"/>
+                                <stop offset="100%" style="stop-color:#764ba2"/>
+                            </linearGradient>
+                            <linearGradient id="gradient4" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#764ba2"/>
+                                <stop offset="100%" style="stop-color:#667eea"/>
+                            </linearGradient>
+                            <linearGradient id="gradient5" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea"/>
+                                <stop offset="100%" style="stop-color:#764ba2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
                 <div class="logo-text">
-                    <i class="fas fa-robot"></i> Hemingwix
+                    <i class="fas fa-robot"></i> Hemingwix Novel Master
                 </div>
                 <div class="orchestrator-badge">AI Orchestrator</div>
             </div>
@@ -1029,11 +1667,39 @@ ORCHESTRATOR_DASHBOARD = '''
                 <div class="sidebar-title">
                     <i class="fas fa-book"></i> "Broken Drill" Manuscript
                 </div>
-                <a href="#" class="document-link" onclick="alert('Notion integration coming soon!')">
-                    <i class="fas fa-file-alt document-icon"></i>
-                    <span>Current Draft</span>
-                </a>
-                <a href="#" class="document-link" onclick="alert('Notion integration coming soon!')">
+                <div class="dropdown-container">
+                    <a href="#" class="document-link dropdown-toggle" onclick="toggleChapterDropdown(event)">
+                        <i class="fas fa-file-alt document-icon"></i>
+                        <span>Current Draft</span>
+                    </a>
+                    <div class="dropdown-menu" id="chapterDropdown">
+                        <a href="/chapter/prologue" class="dropdown-item">
+                            <i class="fas fa-bookmark document-icon"></i>
+                            <span>Prologue</span>
+                        </a>
+                        <a href="/chapter/chapter-1" class="dropdown-item">
+                            <i class="fas fa-file-alt document-icon"></i>
+                            <span>Chapter 1</span>
+                        </a>
+                        <a href="/chapter/chapter-2" class="dropdown-item">
+                            <i class="fas fa-file-alt document-icon"></i>
+                            <span>Chapter 2</span>
+                        </a>
+                        <a href="/chapter/chapter-3" class="dropdown-item">
+                            <i class="fas fa-file-alt document-icon"></i>
+                            <span>Chapter 3</span>
+                        </a>
+                        <a href="/chapter/chapter-4" class="dropdown-item">
+                            <i class="fas fa-file-alt document-icon"></i>
+                            <span>Chapter 4</span>
+                        </a>
+                        <a href="/chapter/chapter-5" class="dropdown-item">
+                            <i class="fas fa-file-alt document-icon"></i>
+                            <span>Chapter 5</span>
+                        </a>
+                    </div>
+                </div>
+                <a href="/outline" class="document-link">
                     <i class="fas fa-list document-icon"></i>
                     <span>Chapter Outline</span>
                 </a>
@@ -1047,7 +1713,7 @@ ORCHESTRATOR_DASHBOARD = '''
                 <div class="sidebar-title">
                     <i class="fas fa-users"></i> Characters & World
                 </div>
-                <a href="#" class="document-link" onclick="alert('Notion integration coming soon!')">
+                <a href="/characters" class="document-link">
                     <i class="fas fa-user document-icon"></i>
                     <span>Character Profiles</span>
                 </a>
@@ -1137,6 +1803,23 @@ ORCHESTRATOR_DASHBOARD = '''
         
         function uploadFile() {
             document.getElementById('fileInput').click();
+        }
+        
+        function toggleChapterDropdown(event) {
+            event.preventDefault();
+            const dropdown = document.getElementById('chapterDropdown');
+            const toggle = event.currentTarget;
+            
+            dropdown.classList.toggle('show');
+            toggle.classList.toggle('active');
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!toggle.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                    toggle.classList.remove('active');
+                }
+            });
         }
         
         async function handleFileUpload() {
